@@ -1,4 +1,4 @@
-import fs from 'fs'
+import fs from 'fs/promises'
 import axios from 'axios'
 
 const load = async (url, dir) => {
@@ -8,12 +8,7 @@ const load = async (url, dir) => {
 
   const content = response.data
 
-  fs.writeFile(`${dir}/${fileName}`, content, err => {
-    if (err) {
-      console.error(err)
-    }
-    // file written successfully
-  })
+  await fs.writeFile(`${dir}/${fileName}`, content)
 }
 
 export default load
