@@ -3,6 +3,7 @@ import fsA from 'fs'
 import axios from 'axios'
 import Debug from 'debug'
 import * as cheerio from 'cheerio'
+import 'axios-debug-log'
 
 const debug = Debug('page-loader')
 
