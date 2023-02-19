@@ -8,8 +8,4 @@ const dir = args.output || process.cwd()
 
 const url = args._[0]
 
-if (!url) {
-  process.exit(1)
-}
-
 load(url, dir)

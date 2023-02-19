@@ -1,12 +1,29 @@
 import fs from 'fs/promises'
 import fsA from 'fs'
 import axios from 'axios'
+import Debug from 'debug'
 import * as cheerio from 'cheerio'
 
+const debug = Debug('page-loader')
+
 const load = async (url, dir = '.') => {
+  if (!url) {
+    throw new Error('Empty url')
+  }
+
   const fileName = url.replaceAll(/http[s]?:\/\//g, '').replaceAll(/[^0-9a-zA-Z]/g, '-')
 
-  const response = await axios.get(url)
+  let response
+
+  try {
+    response = await axios.get(url)
+  }
+  catch (e) {
+    console.error('Url load problem: ', e)
+
+    throw e
+  }
+  // debug(response)
 
   const content = response.data
 
@@ -21,29 +38,37 @@ const load = async (url, dir = '.') => {
   }
   await fs.mkdir(`${dir}/${fileName}_files`)
 
+  debug(tags)
+
   for (let tag of tags) {
     const tagName = tag.element[0].name
     const file = tag.src
 
-    // скипаем загрузку статики из гугла
-    if (!file || file.includes('google.com')) {
-      continue
-    }
     const name = file.split('/').pop()
-    const response = await axios.get(file, { responseType: 'stream' })
-    const isHtml = response.headers['content-type'].includes('text/html')
-    const rewriteName = `${dir}/${fileName}_files/${name}${isHtml ? '.html' : ''}`
 
-    if (tagName === 'img') {
-      $(`img[src="${file}"]`).attr('src', rewriteName)
-    } else {
+    let response
+
+    try {
+      response = await axios.get(file, {responseType: 'stream'})
+    }
+    catch (e) {
+      console.error('Static load error: ', file, e)
+      throw e
+    }
+
+    const isHtml = response.headers['content-type'] && response.headers['content-type'].includes('text/html')
+    const rewriteName = `${fileName}_files/${name}${isHtml ? '.html' : ''}`
+
+    if (tagName !== 'link') {
+      $(`${tagName}[src="${file}"]`).attr('src', rewriteName)
+    }
+    else {
       $(`${tagName}[href="${file}"]`).attr('href', rewriteName)
     }
 
+    await fs.writeFile(`${dir}/${rewriteName}`, response.data)
 
-    // console.log(response.headers)
 
-    await fs.writeFile(rewriteName, response.data)
   }
 
   await fs.writeFile(`${dir}/${fileName}.html`, $.html())
