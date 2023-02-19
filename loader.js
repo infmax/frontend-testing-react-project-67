@@ -12,22 +12,36 @@ const load = async (url, dir = '.') => {
 
   const $ = cheerio.load(content)
 
-  const imgs = $('img').map(function() {
-    return $(this).attr('src')
+  const tags = $('img,link,script').map(function () {
+    return {element: $(this), src: $(this).attr('src') || $(this).attr('href')}
   })
 
   if (fsA.existsSync(`${dir}/${fileName}_files`)) {
-    await fs.rmdir(`${dir}/${fileName}_files`, { recursive: true })
+    await fs.rmdir(`${dir}/${fileName}_files`, {recursive: true})
   }
   await fs.mkdir(`${dir}/${fileName}_files`)
 
-  for (let img of imgs) {
-    const name = img.split('/').pop()
-    const response = await axios.get(img, { responseType: 'stream' })
+  for (let tag of tags) {
+    const tagName = tag.element[0].name
+    const file = tag.src
 
-    const rewriteName = `${dir}/${fileName}_files/${name}`
+    // скипаем загрузку статики из гугла
+    if (!file || file.includes('google.com')) {
+      continue
+    }
+    const name = file.split('/').pop()
+    const response = await axios.get(file, { responseType: 'stream' })
+    const isHtml = response.headers['content-type'].includes('text/html')
+    const rewriteName = `${dir}/${fileName}_files/${name}${isHtml ? '.html' : ''}`
 
-    $(`img[src="${img}"]`).attr('src', rewriteName)
+    if (tagName === 'img') {
+      $(`img[src="${file}"]`).attr('src', rewriteName)
+    } else {
+      $(`${tagName}[href="${file}"]`).attr('href', rewriteName)
+    }
+
+
+    // console.log(response.headers)
 
     await fs.writeFile(rewriteName, response.data)
   }
