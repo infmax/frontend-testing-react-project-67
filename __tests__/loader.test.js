@@ -10,10 +10,12 @@ describe('page loader', () => {
   let html
   let dir
   let loadedHtml
+  let wrongHtml
 
   beforeAll(async () => {
     html = (await fs.readFile(`${__dirname}/__fixtures__/page.html`, 'utf-8')).trim()
     loadedHtml = (await fs.readFile(`${__dirname}/__fixtures__/loaded-page.html`, 'utf-8')).trim()
+    wrongHtml = (await fs.readFile(`${__dirname}/__fixtures__/wrong-page.html`, 'utf-8')).trim()
   })
 
   beforeEach(async() => {
@@ -24,6 +26,10 @@ describe('page loader', () => {
         .get('/')
         .reply(200, html)
 
+    nock('https://google-wrong.com')
+        .get('/')
+        .reply(200, wrongHtml)
+
     dir = await fs.mkdtemp(path.join(os.tmpdir(), 'page-loader-'))
   })
 
@@ -33,6 +39,14 @@ describe('page loader', () => {
 
   it('failed with wrong url', async () => {
     await expect(load('https://atatat/atata', dir)).rejects.toThrow()
+  })
+
+  it('failed with wrong img', async () => {
+    await expect(load('https://atatat/atata', dir)).rejects.toThrow()
+  })
+
+  it('failed with wrong img src', async () => {
+    await expect(load('https://google-wrong.com', dir)).rejects.toThrow()
   })
 
   it('matched html content', async () => {
