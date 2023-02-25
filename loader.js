@@ -10,7 +10,7 @@ import 'axios-debug-log'
 const debug = Debug('page-loader')
 
 const load = async (url, dir = '.') => {
-  if (!url) {
+  if (!url || typeof url !== "string") {
     throw new Error('Empty url')
   }
 

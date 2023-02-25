@@ -37,6 +37,11 @@ describe('page loader', () => {
     await expect(load('', dir)).rejects.toThrow('Empty url')
   })
 
+  it('failed with object url', async () => {
+    await expect(load({}, dir)).rejects.toThrow('Empty url')
+  })
+
+
   it('failed with wrong url', async () => {
     await expect(load('https://atatat/atata', dir)).rejects.toThrow()
   })
