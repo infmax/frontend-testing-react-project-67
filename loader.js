@@ -15,7 +15,7 @@ const load = async (url, dir = '.') => {
   }
 
   debug(url)
-  const fileName = url.replaceAll(/http[s]?:\/\//g, '').replaceAll(/[^0-9a-zA-Z]/g, '-')
+  const fileName = url.replace(/http[s]?:\/\//g, '').replace(/[^0-9a-zA-Z]/g, '-')
 
   let response
 
