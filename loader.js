@@ -61,7 +61,6 @@ const load = async (url, dir = '.') => {
     }
     catch (e) {
       debug('Static load error: ', file, e)
-      throw e
     }
 
     const isHtml = response.headers && response.headers['content-type'] && response.headers['content-type'].includes('text/html')
