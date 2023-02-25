@@ -5,8 +5,8 @@ import path from 'path'
 import os from 'os'
 
 describe('page loader', () => {
-
   let html
+
   let dir
   let loadedHtml
   let wrongHtml
