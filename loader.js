@@ -33,8 +33,15 @@ const load = async (url, dir = '.') => {
 
   const $ = cheerio.load(content)
 
+  const origin = (new URL(url)).origin
+
   const tags = $('img,link,script').map(function () {
-    return {element: $(this), src: $(this).attr('src') || $(this).attr('href')}
+
+    const url = $(this).attr('src') || $(this).attr('href')
+    const src = new URL(url, origin)
+
+    debug(src, url, origin)
+    return {element: $(this), src: src.toString()}
   })
 
   if (fsA.existsSync(`${dir}/${fileName}_files`)) {
@@ -61,17 +68,12 @@ const load = async (url, dir = '.') => {
     }
     catch (e) {
       debug('Static load error: ', file, e)
-
-      // console.error('Static load error: ', file, e)
-      // throw e
     }
 
     if (!response || !response.data) {
       debug('Static load error: ', file)
       continue
     }
-
-
 
     try {
       const isHtml = response && response.headers && response.headers['content-type'] && response.headers['content-type'].includes('text/html')
@@ -89,9 +91,6 @@ const load = async (url, dir = '.') => {
     catch (e) {
       debug('File write error: ', file)
     }
-
-
-
   }
 
   await fs.writeFile(`${dir}/${fileName}.html`, $.html())

@@ -51,7 +51,11 @@ describe('page loader', () => {
   })
 
   it('failed with wrong img src', async () => {
-    await expect(load('https://google-wrong.com', dir)).rejects.toThrow()
+    await load('https://google-wrong.com', dir)
+
+    const loadedContent = (await fs.readFile(`${dir}/google-wrong-com.html`, 'utf-8')).trim()
+
+    expect(loadedContent).toBe(wrongHtml)
   })
 
   it('matched html content', async () => {
@@ -68,5 +72,11 @@ describe('page loader', () => {
     const files = (await fs.readdir(`${dir}/google-com_files/`, 'utf-8')).length
 
     expect(files).toBe(4)
+  })
+
+  it('returned filePath', async () => {
+    const path = await load('https://google.com', dir)
+
+    expect(path).toEqual({ filepath: `${dir}/google-com.html` })
   })
 })
