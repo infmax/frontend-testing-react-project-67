@@ -62,11 +62,11 @@ const load = async (url, dir = '.') => {
     catch (e) {
       debug('Static load error: ', file, e)
 
-      console.error('Static load error: ', file, e)
+      // console.error('Static load error: ', file, e)
       // throw e
     }
 
-    if (!response) {
+    if (!response || !response.data) {
       debug('Static load error: ', file)
       continue
     }
