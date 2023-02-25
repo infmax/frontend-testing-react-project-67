@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import fs from 'fs/promises'
 import fsA from 'fs'
 import axios from 'axios'

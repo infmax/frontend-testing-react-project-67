@@ -5,7 +5,13 @@
   "bin": "page-loader.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "npx jest"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "transform": {
+      "\\.js$": "<rootDir>/node_modules/babel-jest"
+    }
   },
   "repository": {
     "type": "git",
