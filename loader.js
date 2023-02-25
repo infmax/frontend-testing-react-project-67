@@ -14,6 +14,7 @@ const load = async (url, dir = '.') => {
     throw new Error('Empty url')
   }
 
+  debug(url)
   const fileName = url.replaceAll(/http[s]?:\/\//g, '').replaceAll(/[^0-9a-zA-Z]/g, '-')
 
   let response
@@ -22,7 +23,7 @@ const load = async (url, dir = '.') => {
     response = await axios.get(url)
   }
   catch (e) {
-    console.error('Url load problem: ', e)
+    debug('Url load problem: ', e)
 
     throw e
   }
@@ -41,7 +42,7 @@ const load = async (url, dir = '.') => {
   }
   await fs.mkdir(`${dir}/${fileName}_files`)
 
-  debug(tags)
+  // debug(tags)
 
   for (let tag of tags) {
     const tagName = tag.element[0].name
@@ -59,8 +60,7 @@ const load = async (url, dir = '.') => {
       response = await axios.get(file, {responseType: 'stream'})
     }
     catch (e) {
-      debug(file)
-      console.error('Static load error: ', file, e)
+      debug('Static load error: ', file, e)
       throw e
     }
 
