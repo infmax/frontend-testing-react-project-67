@@ -1,8 +1,8 @@
 {
   "name": "@hexlet/code",
   "version": "1.0.0",
-  "main": "page-loader.js",
-  "bin": "bage-loader.js",
+  "main": "loader.js",
+  "bin": "loader.js",
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
