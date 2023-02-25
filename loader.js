@@ -45,6 +45,10 @@ const load = async (url, dir = '.') => {
     const tagName = tag.element[0].name
     const file = tag.src
 
+    if (!file) {
+      continue
+    }
+
     const name = file.split('/').pop()
 
     let response
