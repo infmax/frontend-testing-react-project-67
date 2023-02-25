@@ -95,6 +95,8 @@ const load = async (url, dir = '.') => {
   }
 
   await fs.writeFile(`${dir}/${fileName}.html`, $.html())
+
+  return { filepath: `${dir}/${fileName}.html` }
 }
 
 export default load
