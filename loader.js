@@ -53,11 +53,12 @@ const load = async (url, dir = '.') => {
       response = await axios.get(file, {responseType: 'stream'})
     }
     catch (e) {
+      debug(file)
       console.error('Static load error: ', file, e)
       throw e
     }
 
-    const isHtml = response.headers['content-type'] && response.headers['content-type'].includes('text/html')
+    const isHtml = response.headers && response.headers['content-type'] && response.headers['content-type'].includes('text/html')
     const rewriteName = `${fileName}_files/${name}${isHtml ? '.html' : ''}`
 
     if (tagName !== 'link') {

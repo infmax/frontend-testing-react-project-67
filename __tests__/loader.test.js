@@ -5,7 +5,6 @@ import path from 'path'
 import os from 'os'
 
 describe('page loader', () => {
-  // nock.disableNetConnect()
 
   let html
   let dir
@@ -20,11 +19,12 @@ describe('page loader', () => {
 
   beforeEach(async() => {
     nock('https://google.com')
-        .get('/assets/runtime.js')
-        .reply(200, 'var a = 0')
-    nock('https://google.com')
         .get('/')
         .reply(200, html)
+
+    nock('https://google.com')
+        .get('/assets/runtime.js')
+        .reply(200, 'var a = 0')
 
     nock('https://google-wrong.com')
         .get('/')
