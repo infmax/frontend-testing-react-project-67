@@ -28,8 +28,8 @@ describe('page loader', () => {
       .reply(200, html);
 
     nock('https://google.com')
-        .get('/courses')
-        .reply(200, html);
+      .get('/courses')
+      .reply(200, html);
 
     nock('https://google.com')
       .get('/assets/style.css')
@@ -93,20 +93,14 @@ describe('page loader', () => {
   });
 
   it('created css', async () => {
-    const out = await load('https://google.com', dir);
-
     expect(fsA.existsSync(`${dir}/google-com_files/google-com-assets-style.css`)).toBe(true);
   });
 
   it('created js', async () => {
-    const out = await load('https://google.com', dir);
-
     expect(fsA.existsSync(`${dir}/google-com_files/google-com-assets-runtime.js`)).toBe(true);
   });
 
   it('created html', async () => {
-    const out = await load('https://google.com', dir);
-
     expect(fsA.existsSync(`${dir}/google-com_files/google-com-courses.html`)).toBe(true);
   });
 });
