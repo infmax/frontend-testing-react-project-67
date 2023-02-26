@@ -11,7 +11,7 @@ import path from 'path'
 const debug = Debug('page-loader')
 
 const load = async (url, dir = '.') => {
-  if (!url || typeof url !== "string") {
+  if (!url | !url.toString() || typeof url !== "string") {
     throw new Error('Empty url')
   }
 

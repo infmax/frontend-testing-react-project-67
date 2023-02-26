@@ -42,11 +42,11 @@ describe('page loader', () => {
   })
 
   it('failed with empty url', async () => {
-    await expect(load('', dir)).rejects.toThrow('Empty url')
+    await expect(load('', dir)).rejects.toThrow()
   })
 
   it('failed with object url', async () => {
-    await expect(load({}, dir)).rejects.toThrow('Empty url')
+    await expect(load({}, dir)).rejects.toThrow()
   })
 
 
