@@ -93,14 +93,17 @@ describe('page loader', () => {
   });
 
   it('created css', async () => {
+    await load('https://google.com', dir);
     expect(fsA.existsSync(`${dir}/google-com_files/google-com-assets-style.css`)).toBe(true);
   });
 
   it('created js', async () => {
+    await load('https://google.com', dir);
     expect(fsA.existsSync(`${dir}/google-com_files/google-com-assets-runtime.js`)).toBe(true);
   });
 
   it('created html', async () => {
+    await load('https://google.com', dir);
     expect(fsA.existsSync(`${dir}/google-com_files/google-com-courses.html`)).toBe(true);
   });
 });
