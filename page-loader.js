@@ -9,3 +9,10 @@ const dir = args.output || process.cwd()
 const url = args._[0]
 
 load(url, dir)
+    .then(({filepath}) => {
+      console.log(filepath)
+    })
+    .catch((err) => {
+      console.error(err.toString())
+      process.exit(1)
+    })
