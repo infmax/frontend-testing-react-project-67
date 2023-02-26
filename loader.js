@@ -15,7 +15,6 @@ const load = async (url, dir = '.') => {
     throw new Error('Empty url')
   }
 
-  debug(url)
   const fileName = url.replace(/http[s]?:\/\//g, '').replace(/[^0-9a-zA-Z]/g, '-')
 
   let response
@@ -41,8 +40,7 @@ const load = async (url, dir = '.') => {
     const url = $(this).attr('src') || $(this).attr('href')
     const src = new URL(url, origin)
 
-    debug(src, url, origin)
-    return {element: $(this), src: src.toString(), originalSrc: url}
+    return {element: $(this), src, originalSrc: url}
   })
 
   if (fsA.existsSync(`${dir}/${fileName}_files`)) {
@@ -50,20 +48,18 @@ const load = async (url, dir = '.') => {
   }
   await fs.mkdir(`${dir}/${fileName}_files`)
 
-  // debug(tags)
-
   for (let tag of tags) {
     const tagName = tag.element[0].name
-    const file = tag.src
+    const file = tag.src.toString()
 
-    if (!file) {
+    if (!file || tag.src.origin !== origin) {
       continue
     }
 
     let response
 
     try {
-      response = await axios.get(file, {responseType: 'stream'})
+      response = await axios.get(file, {responseType: 'arraybuffer'})
     }
     catch (e) {
       debug('Static load error: ', file, e)

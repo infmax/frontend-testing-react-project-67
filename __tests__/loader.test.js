@@ -10,17 +10,25 @@ describe('page loader', () => {
   let dir
   let loadedHtml
   let wrongHtml
+  let css
 
   beforeAll(async () => {
+    html = (await fs.readFile(`${__dirname}/__fixtures__/page.html`, 'utf-8')).trim()
+    css = (await fs.readFile(`${__dirname}/__fixtures__/style.css`, 'utf-8')).trim()
+
     html = (await fs.readFile(`${__dirname}/__fixtures__/page.html`, 'utf-8')).trim()
     loadedHtml = (await fs.readFile(`${__dirname}/__fixtures__/loaded-page.html`, 'utf-8')).trim()
     wrongHtml = (await fs.readFile(`${__dirname}/__fixtures__/wrong-page.html`, 'utf-8')).trim()
   })
 
-  beforeEach(async() => {
+  beforeEach(async () => {
     nock('https://google.com')
         .get('/')
         .reply(200, html)
+
+    nock('https://google.com')
+        .get('/assets/style.css')
+        .reply(200, css)
 
     nock('https://google.com')
         .get('/assets/runtime.js')
@@ -71,12 +79,12 @@ describe('page loader', () => {
 
     const files = (await fs.readdir(`${dir}/google-com_files/`, 'utf-8')).length
 
-    expect(files).toBe(4)
+    expect(files).toBe(2)
   })
 
   it('returned filePath', async () => {
     const path = await load('https://google.com', dir)
 
-    expect(path).toEqual({ filepath: `${dir}/google-com.html` })
+    expect(path).toEqual({filepath: `${dir}/google-com.html`})
   })
 })
