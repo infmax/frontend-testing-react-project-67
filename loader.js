@@ -74,13 +74,11 @@ const load = async (url, dir = '.') => {
       continue
     }
 
-    const isHtml = response && response.headers && response.headers['content-type'] && response.headers['content-type'].includes('text/html')
-
     const { dir: fileDir, name, ext } = path.parse(file)
 
     const staticFileName = path.join(fileDir, name).replace(/http[s]?:\//g, '')
         .replace(/[^0-9a-zA-Z]/g, '-')
-    const rewriteName = `${fileName}_files/${staticFileName}${ext}${isHtml ? '.html' : ''}`
+    const rewriteName = `${fileName}_files/${staticFileName}${ext || '.html' }`
 
     if (tagName !== 'link') {
       $(`${tagName}[src="${tag.originalSrc}"]`).attr('src', rewriteName)
