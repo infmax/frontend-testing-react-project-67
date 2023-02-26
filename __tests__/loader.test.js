@@ -1,6 +1,7 @@
 import nock from 'nock';
 import fs from 'fs/promises';
 import path from 'path';
+import fsA from 'fs';
 import os from 'os';
 import load from '../loader.js';
 
@@ -25,6 +26,10 @@ describe('page loader', () => {
     nock('https://google.com')
       .get('/')
       .reply(200, html);
+
+    nock('https://google.com')
+        .get('/courses')
+        .reply(200, html);
 
     nock('https://google.com')
       .get('/assets/style.css')
@@ -78,12 +83,30 @@ describe('page loader', () => {
 
     const files = (await fs.readdir(`${dir}/google-com_files/`, 'utf-8')).length;
 
-    expect(files).toBe(2);
+    expect(files).toBe(3);
   });
 
   it('returned filePath', async () => {
     const out = await load('https://google.com', dir);
 
     expect(out).toEqual({ filepath: `${dir}/google-com.html` });
+  });
+
+  it('created css', async () => {
+    const out = await load('https://google.com', dir);
+
+    expect(fsA.existsSync(`${dir}/google-com_files/google-com-assets-style.css`)).toBe(true);
+  });
+
+  it('created js', async () => {
+    const out = await load('https://google.com', dir);
+
+    expect(fsA.existsSync(`${dir}/google-com_files/google-com-assets-runtime.js`)).toBe(true);
+  });
+
+  it('created html', async () => {
+    const out = await load('https://google.com', dir);
+
+    expect(fsA.existsSync(`${dir}/google-com_files/google-com-courses.html`)).toBe(true);
   });
 });
