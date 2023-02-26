@@ -4,7 +4,9 @@ import load from './loader.js'
 
 const args = parseArgs(process.argv.slice(2))
 
-const dir = args.output || process.cwd()
+process.exit()
+
+const dir = args.output || args.o || process.cwd()
 
 const url = args._[0]
 
