@@ -6,6 +6,7 @@ import Debug from 'debug'
 import * as cheerio from 'cheerio'
 import axios from 'axios'
 import 'axios-debug-log'
+import path from 'path'
 
 const debug = Debug('page-loader')
 
@@ -59,8 +60,6 @@ const load = async (url, dir = '.') => {
       continue
     }
 
-    const name = file.split('/').pop()
-
     let response
 
     try {
@@ -76,7 +75,12 @@ const load = async (url, dir = '.') => {
     }
 
     const isHtml = response && response.headers && response.headers['content-type'] && response.headers['content-type'].includes('text/html')
-    const rewriteName = `${fileName}_files/${fileName}_${name}${isHtml ? '.html' : ''}`
+
+    const { dir: fileDir, name, ext } = path.parse(file)
+
+    const staticFileName = path.join(fileDir, name).replace(/http[s]?:\//g, '')
+        .replace(/[^0-9a-zA-Z]/g, '-')
+    const rewriteName = `${fileName}_files/${staticFileName}${ext}${isHtml ? '.html' : ''}`
 
     if (tagName !== 'link') {
       $(`${tagName}[src="${tag.originalSrc}"]`).attr('src', rewriteName)
@@ -89,7 +93,7 @@ const load = async (url, dir = '.') => {
       await fs.writeFile(`${dir}/${rewriteName}`, response.data)
     }
     catch (e) {
-      debug('File write error: ', file)
+      debug('File write error: ', file, e)
     }
   }
 
