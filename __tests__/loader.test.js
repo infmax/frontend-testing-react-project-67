@@ -1,90 +1,89 @@
-import nock from 'nock'
-import load from "../loader"
-import fs from 'fs/promises'
-import path from 'path'
-import os from 'os'
+import nock from 'nock';
+import fs from 'fs/promises';
+import path from 'path';
+import os from 'os';
+import load from '../loader.js';
 
 describe('page loader', () => {
-  let html
+  let html;
 
-  let dir
-  let loadedHtml
-  let wrongHtml
-  let css
+  let dir;
+  let loadedHtml;
+  let wrongHtml;
+  let css;
 
   beforeAll(async () => {
-    html = (await fs.readFile(`${__dirname}/__fixtures__/page.html`, 'utf-8')).trim()
-    css = (await fs.readFile(`${__dirname}/__fixtures__/style.css`, 'utf-8')).trim()
+    html = (await fs.readFile(`${__dirname}/__fixtures__/page.html`, 'utf-8')).trim();
+    css = (await fs.readFile(`${__dirname}/__fixtures__/style.css`, 'utf-8')).trim();
 
-    html = (await fs.readFile(`${__dirname}/__fixtures__/page.html`, 'utf-8')).trim()
-    loadedHtml = (await fs.readFile(`${__dirname}/__fixtures__/loaded-page.html`, 'utf-8')).trim()
-    wrongHtml = (await fs.readFile(`${__dirname}/__fixtures__/wrong-page.html`, 'utf-8')).trim()
-  })
+    html = (await fs.readFile(`${__dirname}/__fixtures__/page.html`, 'utf-8')).trim();
+    loadedHtml = (await fs.readFile(`${__dirname}/__fixtures__/loaded-page.html`, 'utf-8')).trim();
+    wrongHtml = (await fs.readFile(`${__dirname}/__fixtures__/wrong-page.html`, 'utf-8')).trim();
+  });
 
   beforeEach(async () => {
     nock('https://google.com')
-        .get('/')
-        .reply(200, html)
+      .get('/')
+      .reply(200, html);
 
     nock('https://google.com')
-        .get('/assets/style.css')
-        .reply(200, css)
+      .get('/assets/style.css')
+      .reply(200, css);
 
     nock('https://google.com')
-        .get('/assets/runtime.js')
-        .reply(200, 'var a = 0')
+      .get('/assets/runtime.js')
+      .reply(200, 'var a = 0');
 
     nock('https://google-wrong.com')
-        .get('/')
-        .reply(200, wrongHtml)
+      .get('/')
+      .reply(200, wrongHtml);
 
-    dir = await fs.mkdtemp(path.join(os.tmpdir(), 'page-loader-'))
-  })
+    dir = await fs.mkdtemp(path.join(os.tmpdir(), 'page-loader-'));
+  });
 
   it('failed with empty url', async () => {
-    await expect(load('', dir)).rejects.toThrow()
-  })
+    await expect(load('', dir)).rejects.toThrow();
+  });
 
   it('failed with object url', async () => {
-    await expect(load({}, dir)).rejects.toThrow()
-  })
-
+    await expect(load({}, dir)).rejects.toThrow();
+  });
 
   it('failed with wrong url', async () => {
-    await expect(load('https://atatat/atata', dir)).rejects.toThrow()
-  })
+    await expect(load('https://atatat/atata', dir)).rejects.toThrow();
+  });
 
   it('failed with wrong img', async () => {
-    await expect(load('https://atatat/atata', dir)).rejects.toThrow()
-  })
+    await expect(load('https://atatat/atata', dir)).rejects.toThrow();
+  });
 
   it('failed with wrong img src', async () => {
-    await load('https://google-wrong.com', dir)
+    await load('https://google-wrong.com', dir);
 
-    const loadedContent = (await fs.readFile(`${dir}/google-wrong-com.html`, 'utf-8')).trim()
+    const loadedContent = (await fs.readFile(`${dir}/google-wrong-com.html`, 'utf-8')).trim();
 
-    expect(loadedContent).toBe(wrongHtml)
-  })
+    expect(loadedContent).toBe(wrongHtml);
+  });
 
   it('matched html content', async () => {
-    await load('https://google.com', dir)
+    await load('https://google.com', dir);
 
-    const loadedContent = (await fs.readFile(`${dir}/google-com.html`, 'utf-8')).trim()
+    const loadedContent = (await fs.readFile(`${dir}/google-com.html`, 'utf-8')).trim();
 
-    expect(loadedContent).toBe(loadedHtml)
-  })
+    expect(loadedContent).toBe(loadedHtml);
+  });
 
   it('created stat directory', async () => {
-    await load('https://google.com', dir)
+    await load('https://google.com', dir);
 
-    const files = (await fs.readdir(`${dir}/google-com_files/`, 'utf-8')).length
+    const files = (await fs.readdir(`${dir}/google-com_files/`, 'utf-8')).length;
 
-    expect(files).toBe(2)
-  })
+    expect(files).toBe(2);
+  });
 
   it('returned filePath', async () => {
-    const path = await load('https://google.com', dir)
+    const out = await load('https://google.com', dir);
 
-    expect(path).toEqual({filepath: `${dir}/google-com.html`})
-  })
-})
+    expect(out).toEqual({ filepath: `${dir}/google-com.html` });
+  });
+});
