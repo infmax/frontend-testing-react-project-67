@@ -76,7 +76,7 @@ const load = async (url, dir = '.') => {
     }
 
     const isHtml = response && response.headers && response.headers['content-type'] && response.headers['content-type'].includes('text/html')
-    const rewriteName = `${fileName}_files/${name}${isHtml ? '.html' : ''}`
+    const rewriteName = `${fileName}_files/${fileName}_${name}${isHtml ? '.html' : ''}`
 
     if (tagName !== 'link') {
       $(`${tagName}[src="${tag.originalSrc}"]`).attr('src', rewriteName)
