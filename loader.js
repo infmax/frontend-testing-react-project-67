@@ -41,7 +41,7 @@ const load = async (url, dir = '.') => {
     const src = new URL(url, origin)
 
     debug(src, url, origin)
-    return {element: $(this), src: src.toString()}
+    return {element: $(this), src: src.toString(), originalSrc: url}
   })
 
   if (fsA.existsSync(`${dir}/${fileName}_files`)) {
@@ -82,10 +82,10 @@ const load = async (url, dir = '.') => {
       await fs.writeFile(`${dir}/${rewriteName}`, response.data)
 
       if (tagName !== 'link') {
-        $(`${tagName}[src="${file}"]`).attr('src', rewriteName)
+        $(`${tagName}[src="${tag.originalSrc}"]`).attr('src', rewriteName)
       }
       else {
-        $(`${tagName}[href="${file}"]`).attr('href', rewriteName)
+        $(`${tagName}[href="${tag.originalSrc}"]`).attr('href', rewriteName)
       }
     }
     catch (e) {
