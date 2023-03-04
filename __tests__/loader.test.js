@@ -103,7 +103,7 @@ describe('page loader', () => {
   });
 
   it('created with existing dir', async () => {
-    await fs.mkdir(dir + '/google-com_files');
+    await fs.mkdir(`${dir}/google-com_files`);
 
     await load('https://google.com', dir);
     const files = (await fs.readdir(`${dir}/google-com_files/`, 'utf-8')).length;
