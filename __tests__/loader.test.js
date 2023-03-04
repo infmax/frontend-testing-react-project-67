@@ -12,7 +12,7 @@ let loadedHtml;
 let wrongHtml;
 let css;
 
-nock.disableNetConnect()
+nock.disableNetConnect();
 
 beforeAll(async () => {
   html = (await fs.readFile(`${__dirname}/__fixtures__/page.html`, 'utf-8')).trim();
@@ -25,28 +25,28 @@ beforeAll(async () => {
 
 beforeEach(async () => {
   nock('https://google.com')
-      .get('/')
-      .reply(200, html);
+    .get('/')
+    .reply(200, html);
 
   nock('https://google.com')
-      .get('/courses')
-      .reply(200, html);
+    .get('/courses')
+    .reply(200, html);
 
   nock('https://google.com')
-      .get('/assets/style.css')
-      .reply(200, css);
+    .get('/assets/style.css')
+    .reply(200, css);
 
   nock('https://google.com')
-      .get('/assets/example.jpg')
-      .reply(200, 'any');
+    .get('/assets/example.jpg')
+    .reply(200, 'any');
 
   nock('https://google.com')
-      .get('/assets/runtime.js')
-      .reply(200, 'var a = 0');
+    .get('/assets/runtime.js')
+    .reply(200, 'var a = 0');
 
   nock('https://google-wrong.com')
-      .get('/')
-      .reply(200, wrongHtml);
+    .get('/')
+    .reply(200, wrongHtml);
 
   dir = await fs.mkdtemp(path.join(os.tmpdir(), 'page-loader-'));
 });
