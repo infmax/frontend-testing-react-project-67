@@ -1,5 +1,6 @@
 ### Hexlet tests and linter status:
 [![Actions Status](https://github.com/infmax/frontend-testing-react-project-67/workflows/hexlet-check/badge.svg)](https://github.com/infmax/frontend-testing-react-project-67/actions)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/f8b8bb2522fdacdcd61b/test_coverage)](https://codeclimate.com/github/infmax/frontend-testing-react-project-67/test_coverage)
 
 # Page load script
 ## Quick start
