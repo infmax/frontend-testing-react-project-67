@@ -24,3 +24,7 @@ For start test should write command below
 ```
 npm test
 ```
+
+# Demo
+
+[ASCIInema](https://asciinema.org/a/qk7g1VEaKQlq1TYJvslEHbkOh)
