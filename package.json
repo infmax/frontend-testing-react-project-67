@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "loader.js",
   "bin": {
-    "page-loader": "page-loader.js"
+    "page-loader": "bin/page-loader.js"
   },
   "type": "module",
   "scripts": {
@@ -38,6 +38,7 @@
     "axios": "^0.27.2",
     "axios-debug-log": "^1.0.0",
     "cheerio": "^1.0.0-rc.12",
+    "commander": "^10.0.0",
     "debug": "^4.3.4",
     "minimist": "^1.2.8"
   }
