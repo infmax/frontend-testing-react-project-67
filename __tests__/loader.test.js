@@ -13,6 +13,8 @@ describe('page loader', () => {
   let wrongHtml;
   let css;
 
+  nock.disableNetConnect()
+
   beforeAll(async () => {
     html = (await fs.readFile(`${__dirname}/__fixtures__/page.html`, 'utf-8')).trim();
     css = (await fs.readFile(`${__dirname}/__fixtures__/style.css`, 'utf-8')).trim();
@@ -34,6 +36,10 @@ describe('page loader', () => {
     nock('https://google.com')
       .get('/assets/style.css')
       .reply(200, css);
+
+    nock('https://google.com')
+        .get('/assets/example.jpg')
+        .reply(200, 'any');
 
     nock('https://google.com')
       .get('/assets/runtime.js')
@@ -83,7 +89,7 @@ describe('page loader', () => {
 
     const files = (await fs.readdir(`${dir}/google-com_files/`, 'utf-8')).length;
 
-    expect(files).toBe(3);
+    expect(files).toBe(4);
   });
 
   it('returned filePath', async () => {
@@ -108,7 +114,7 @@ describe('page loader', () => {
     await load('https://google.com', dir);
     const files = (await fs.readdir(`${dir}/google-com_files/`, 'utf-8')).length;
 
-    expect(files).toBe(3);
+    expect(files).toBe(4);
   });
 
   it('created html', async () => {
