@@ -1,5 +1,5 @@
 install:
-	npm ci
+	npm install --force
 lint:
 	npx eslint .
 test:
