@@ -7,7 +7,7 @@
   },
   "type": "module",
   "scripts": {
-    "test": "jest --collect-coverage"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
