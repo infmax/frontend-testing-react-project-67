@@ -41,5 +41,8 @@
     "commander": "^10.0.0",
     "debug": "^4.3.4",
     "minimist": "^1.2.8"
+  },
+  "jest": {
+    "testPathIgnorePatterns": ["__fixtures__"]
   }
 }

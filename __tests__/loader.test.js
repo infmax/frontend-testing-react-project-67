@@ -1,7 +1,6 @@
 import nock from 'nock';
 import fs from 'fs/promises';
 import path from 'path';
-import fsA from 'fs';
 import os from 'os';
 import load from '../loader.js';
 
@@ -10,17 +9,51 @@ let html;
 let dir;
 let loadedHtml;
 let wrongHtml;
-let css;
 
 nock.disableNetConnect();
 
-beforeAll(async () => {
-  html = (await fs.readFile(`${__dirname}/__fixtures__/page.html`, 'utf-8')).trim();
-  css = (await fs.readFile(`${__dirname}/__fixtures__/style.css`, 'utf-8')).trim();
+const staticFiles = [
+  {
+    file: 'style.css',
+    path: '/assets/style.css',
+    convertedName: 'google-com-assets-style.css',
+  },
+  {
+    file: 'page.html',
+    path: '/courses',
+    convertedName: 'google-com-courses.html',
+  },
+  {
+    file: 'runtime.js',
+    path: '/assets/runtime.js',
+    convertedName: 'google-com-assets-runtime.js',
+  },
+];
 
-  html = (await fs.readFile(`${__dirname}/__fixtures__/page.html`, 'utf-8')).trim();
-  loadedHtml = (await fs.readFile(`${__dirname}/__fixtures__/loaded-page.html`, 'utf-8')).trim();
-  wrongHtml = (await fs.readFile(`${__dirname}/__fixtures__/wrong-page.html`, 'utf-8')).trim();
+const staticFilesContent = {};
+
+const readFile = async (fileName) => {
+  const file = await fs.readFile(fileName, 'utf-8');
+  return file.trim();
+};
+
+beforeAll(async () => {
+  nock.disableNetConnect();
+  html = (await readFile(`${__dirname}/__fixtures__/page.html`));
+
+  const promises = staticFiles.map((file) => readFile(`${__dirname}/__fixtures__/${file.file}`)
+    .then((r) => {
+      staticFilesContent[file.file] = r;
+    }));
+
+  await Promise.all(promises);
+
+  loadedHtml = (await readFile(`${__dirname}/__fixtures__/loaded-page.html`));
+  wrongHtml = (await readFile(`${__dirname}/__fixtures__/wrong-page.html`));
+});
+
+afterAll(() => {
+  nock.enableNetConnect();
 });
 
 beforeEach(async () => {
@@ -28,21 +61,14 @@ beforeEach(async () => {
     .get('/')
     .reply(200, html);
 
-  nock('https://google.com')
-    .get('/courses')
-    .reply(200, html);
+  staticFiles.forEach((file) => {
+    nock('https://google.com').get(file.path)
+      .reply(200, staticFilesContent[file.file]);
+  });
 
-  nock('https://google.com')
-    .get('/assets/style.css')
-    .reply(200, css);
-
-  nock('https://google.com')
-    .get('/assets/example.jpg')
-    .reply(200, 'any');
-
-  nock('https://google.com')
-    .get('/assets/runtime.js')
-    .reply(200, 'var a = 0');
+  [404, 500].forEach((code) => {
+    nock('https://google.com').get(code).reply(code);
+  });
 
   nock('https://google-wrong.com')
     .get('/')
@@ -65,7 +91,7 @@ describe('positive scenarios', () => {
 
     const files = (await fs.readdir(`${dir}/google-com_files/`, 'utf-8')).length;
 
-    expect(files).toBe(4);
+    expect(files).toBe(3);
   });
 
   it('returned filePath', async () => {
@@ -74,14 +100,12 @@ describe('positive scenarios', () => {
     expect(out).toEqual({ filepath: `${dir}/google-com.html` });
   });
 
-  it('created css', async () => {
+  test.each(staticFiles)('it created file %s', async (file) => {
     await load('https://google.com', dir);
-    expect(fsA.existsSync(`${dir}/google-com_files/google-com-assets-style.css`)).toBe(true);
-  });
 
-  it('created js', async () => {
-    await load('https://google.com', dir);
-    expect(fsA.existsSync(`${dir}/google-com_files/google-com-assets-runtime.js`)).toBe(true);
+    const generated = await readFile(`${dir}/google-com_files/${file.convertedName}`);
+
+    expect(staticFilesContent[file.file]).toEqual(generated);
   });
 
   it('created with existing dir', async () => {
@@ -90,12 +114,7 @@ describe('positive scenarios', () => {
     await load('https://google.com', dir);
     const files = (await fs.readdir(`${dir}/google-com_files/`, 'utf-8')).length;
 
-    expect(files).toBe(4);
-  });
-
-  it('created html', async () => {
-    await load('https://google.com', dir);
-    expect(fsA.existsSync(`${dir}/google-com_files/google-com-courses.html`)).toBe(true);
+    expect(files).toBe(3);
   });
 });
 
@@ -122,5 +141,9 @@ describe('negative scenarios', () => {
     const loadedContent = (await fs.readFile(`${dir}/google-wrong-com.html`, 'utf-8')).trim();
 
     expect(loadedContent).toBe(wrongHtml);
+  });
+
+  test.each([404, 500])('failed with error code %s', async (code) => {
+    await expect(load(`https://google.com/${code}`, dir)).rejects.toThrow(new RegExp(code));
   });
 });
